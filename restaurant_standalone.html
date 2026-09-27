@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Saffron & Ember — modern restaurant website with an AI ordering assistant." />
+  <title>Saffron & Ember | Modern Dining</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+
+:root{
+  --ink:#171713;
+  --paper:#f4f0e8;
+  --cream:#fffaf0;
+  --accent:#e46f2f;
+  --accent2:#f6b545;
+  --line:rgba(23,23,19,.12);
+  --muted:#6e6a61;
+  --shadow:0 24px 60px rgba(0,0,0,.18);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:"DM Sans",system-ui,sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.container{width:min(1160px,calc(100% - 40px));margin:auto}
+.nav-wrap{
+  position:fixed; inset:0 0 auto 0; z-index:30;
+  background:rgba(18,18,15,.68); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.08)
+}
+.nav{height:76px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:10px;align-items:center;color:white;text-decoration:none;font-weight:700}
+.brand-mark{
+  width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:var(--accent);font-family:"Playfair Display",serif;font-size:20px
+}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{color:#f5f2eb;text-decoration:none;font-size:14px}
+.menu-toggle{display:none;background:none;border:0;color:white;font-size:24px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  border:0;border-radius:999px;padding:14px 22px;
+  background:var(--accent);color:white;font-weight:700;text-decoration:none;
+  transition:.2s transform,.2s opacity
+}
+.btn:hover{transform:translateY(-2px)}
+.btn-small{padding:10px 16px;font-size:13px}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.55)}
+.btn-dark{background:var(--ink)}
+.hero{
+  min-height:780px;position:relative;display:grid;align-items:center;color:white;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.68),rgba(0,0,0,.15)),
+    url("https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=2000&q=85") center/cover;
+}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.28),transparent 50%)}
+.hero-content{position:relative;padding-top:70px}
+.eyebrow{font-weight:700;letter-spacing:.16em;font-size:12px;margin:0 0 18px;color:#ffd6b8}
+.eyebrow.dark{color:#9a4d26}
+h1,h2,h3{font-family:"Playfair Display",serif;margin:0}
+h1{font-size:clamp(58px,9vw,118px);line-height:.82;letter-spacing:-.04em;max-width:900px}
+h1 span{color:#f7bd79}
+.hero-copy{max-width:620px;font-size:18px;line-height:1.7;color:#eee8df;margin:30px 0}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.hero-stats{display:flex;gap:46px;margin-top:65px}
+.hero-stats div{display:flex;flex-direction:column;gap:6px}
+.hero-stats strong{font-size:22px}
+.hero-stats span{font-size:12px;color:#d8d0c5}
+.section{padding:110px 0}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+h2{font-size:clamp(40px,5vw,70px);line-height:1.02;letter-spacing:-.03em}
+.intro-copy{font-size:18px;line-height:1.8;color:#5e5a53}
+.text-link{color:var(--ink);font-weight:700;text-decoration:none;border-bottom:1px solid var(--ink)}
+.menu-section{background:#fbf8f2}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:42px}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.dish-card{background:white;border-radius:24px;overflow:hidden;border:1px solid var(--line)}
+.dish-image{height:240px;background-position:center;background-size:cover;position:relative}
+.pill{position:absolute;left:16px;top:16px;background:rgba(255,255,255,.92);padding:8px 11px;border-radius:999px;font-size:11px;font-weight:700}
+.img-burger{background-image:url("https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80")}
+.img-steak{background-image:url("https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=900&q=80")}
+.img-pasta{background-image:url("https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=900&q=80")}
+.img-chicken{background-image:url("https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=900&q=80")}
+.img-pizza{background-image:url("https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=900&q=80")}
+.img-dessert{background-image:url("https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=900&q=80")}
+.dish-info{padding:22px}
+.dish-title{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.dish-title h3{font-size:22px}
+.dish-title strong{white-space:nowrap;color:#9a4d26}
+.dish-info p{color:var(--muted);line-height:1.6;font-size:14px;margin-bottom:0}
+.feature{background:var(--ink);color:white}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.feature-photo{
+  min-height:640px;border-radius:34px;
+  background:url("https://images.unsplash.com/photo-1516211697506-8360dbcfe9a4?auto=format&fit=crop&w=1200&q=85") center/cover
+}
+.feature-copy>p:not(.eyebrow){color:#c8c1b7;line-height:1.8;font-size:17px;margin:26px 0 34px}
+.feature-points{display:grid;gap:20px}
+.feature-points div{display:grid;grid-template-columns:48px 1fr;gap:16px;padding-top:20px;border-top:1px solid rgba(255,255,255,.14)}
+.feature-points span{font-size:12px;color:#f1a36d}
+.feature-points p{margin:0;color:#d4cec5;line-height:1.6}
+.feature-points strong{color:white}
+.reviews{text-align:center}
+.review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:40px;text-align:left}
+blockquote{margin:0;background:#fff;padding:30px;border-radius:22px;font-family:"Playfair Display",serif;font-size:22px;line-height:1.55}
+blockquote footer{font-family:"DM Sans",sans-serif;font-size:13px;margin-top:22px;color:var(--muted)}
+.contact{background:#d9662c;color:white}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px}
+.contact .eyebrow{color:#ffe1cf}
+.muted{color:#ffe6d8}
+.hours{background:rgba(255,255,255,.12);padding:34px;border-radius:24px}
+.hours h3{font-size:28px;margin-bottom:22px}
+.hours p{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.18);padding:15px 0;gap:18px}
+.hours .btn{background:white;color:var(--ink);margin-top:18px}
+.site-footer{background:#10100e;color:#aaa;padding:28px 0}
+.footer-row{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.footer-row p{font-size:13px}
+.chat-fab{
+  position:fixed;right:24px;bottom:24px;z-index:40;
+  display:flex;align-items:center;gap:10px;border:0;border-radius:18px;
+  background:#171713;color:white;padding:13px 16px;box-shadow:var(--shadow)
+}
+.chat-fab>span{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--accent)}
+.chat-fab div{display:flex;flex-direction:column;align-items:flex-start}
+.chat-fab small{color:#aaa;font-size:10px;margin-top:3px}
+.chat-panel{
+  position:fixed;right:24px;bottom:24px;width:min(390px,calc(100vw - 24px));
+  height:min(620px,calc(100vh - 40px));z-index:50;background:#fff;border-radius:24px;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;
+  transform:translateY(20px) scale(.98);opacity:0;pointer-events:none;transition:.22s ease
+}
+.chat-panel.open{transform:none;opacity:1;pointer-events:auto}
+.chat-head{display:flex;justify-content:space-between;align-items:center;padding:18px;background:#171713;color:white}
+.agent{display:flex;gap:11px;align-items:center}
+.avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--accent)}
+.agent strong{display:block}
+.agent span{font-size:11px;color:#aaa}
+.agent i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#5ee182;margin-right:5px}
+#closeChat{background:none;border:0;color:white;font-size:28px}
+.chat-body{flex:1;overflow:auto;padding:18px;background:#f6f3ed}
+.message{display:flex;margin-bottom:12px}
+.message.user{justify-content:flex-end}
+.bubble{max-width:82%;padding:12px 14px;border-radius:16px;background:white;line-height:1.5;font-size:14px}
+.user .bubble{background:#171713;color:white;border-bottom-right-radius:5px}
+.bot .bubble{border-bottom-left-radius:5px}
+.typing .bubble{color:#777}
+.quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.quick-actions button{border:1px solid #ddd5c9;background:white;border-radius:999px;padding:8px 10px;font-size:11px}
+.chat-input{display:grid;grid-template-columns:1fr 44px;gap:8px;padding:12px;background:white;border-top:1px solid #eee}
+.chat-input input{border:1px solid #ded8ce;border-radius:14px;padding:12px 13px;outline:none}
+.chat-input input:focus{border-color:#a99f91}
+.chat-input button{border:0;border-radius:14px;background:var(--accent);color:white;font-size:19px}
+@media(max-width:900px){
+  .menu-grid,.review-grid{grid-template-columns:1fr 1fr}
+  .split,.feature-grid,.contact-grid{grid-template-columns:1fr}
+  .feature-photo{min-height:500px}
+  .nav-links{
+    position:absolute;top:76px;left:0;right:0;background:#171713;padding:20px;
+    flex-direction:column;display:none
+  }
+  .nav-links.open{display:flex}
+  .menu-toggle{display:block}
+}
+@media(max-width:620px){
+  .container{width:min(100% - 24px,1160px)}
+  .hero{min-height:730px}
+  .hero-stats{gap:20px;justify-content:space-between}
+  .hero-stats span{font-size:10px}
+  .section{padding:78px 0}
+  .menu-grid,.review-grid{grid-template-columns:1fr}
+  .section-head{align-items:flex-start;flex-direction:column}
+  .footer-row{flex-direction:column;align-items:flex-start}
+  .chat-fab{right:12px;bottom:12px}
+  .chat-fab small{display:none}
+  .chat-panel{right:12px;bottom:12px;width:calc(100vw - 24px);height:calc(100vh - 24px)}
+}
+
+  </style>
+</head>
+<body>
+  <header class="nav-wrap">
+    <nav class="nav container">
+      <a class="brand" href="#home" aria-label="Saffron & Ember home">
+        <span class="brand-mark">S</span>
+        <span>Saffron & Ember</span>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">☰</button>
+
+      <div class="nav-links" id="navLinks">
+        <a href="#home">Home</a>
+        <a href="#menu">Menu</a>
+        <a href="#about">About</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#contact">Contact</a>
+        <button class="btn btn-small open-chat">Order with AI</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-overlay"></div>
+      <div class="container hero-content">
+        <p class="eyebrow">FRESH • BOLD • UNFORGETTABLE</p>
+        <h1>Food worth<br><span>remembering.</span></h1>
+        <p class="hero-copy">
+          Contemporary comfort food, seasonal ingredients, and a little fire.
+          Dine in, take away, or let our AI assistant help you place an order.
+        </p>
+        <div class="hero-actions">
+          <a href="#menu" class="btn">Explore Menu</a>
+          <button class="btn btn-ghost open-chat">Chat to Order</button>
+        </div>
+
+        <div class="hero-stats">
+          <div><strong>4.9★</strong><span>Guest rating</span></div>
+          <div><strong>30 min</strong><span>Avg. delivery</span></div>
+          <div><strong>7 days</strong><span>Open weekly</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section intro">
+      <div class="container split">
+        <div>
+          <p class="eyebrow dark">OUR STORY</p>
+          <h2>Made from scratch.<br>Served with soul.</h2>
+        </div>
+        <div class="intro-copy">
+          <p>
+            At Saffron & Ember, we bring together flame-grilled favorites, comforting classics,
+            and modern plates inspired by local flavors. Our kitchen focuses on freshness,
+            generous portions, and the kind of food you want to come back for.
+          </p>
+          <a href="#about" class="text-link">Learn about us →</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section menu-section" id="menu">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow dark">POPULAR PICKS</p>
+            <h2>Guest favorites</h2>
+          </div>
+          <button class="btn btn-dark open-chat">Ask AI about the menu</button>
+        </div>
+
+        <div class="menu-grid">
+          <article class="dish-card">
+            <div class="dish-image img-burger">
+              <span class="pill">Best Seller</span>
+            </div>
+            <div class="dish-info">
+              <div class="dish-title"><h3>Smoky Ember Burger</h3><strong>Rs. 1,290</strong></div>
+              <p>Double smashed beef, cheddar, caramelized onion, smoky house sauce.</p>
+            </div>
+          </article>
+
+          <article class="dish-card">
+            <div class="dish-image img-steak">
+              <span class="pill">Chef's Pick</span>
+            </div>
+            <div class="dish-info">
+              <div class="dish-title"><h3>Fire-Grilled Steak</h3><strong>Rs. 2,690</strong></div>
+              <p>Char-grilled steak, herb butter, roasted vegetables, pepper sauce.</p>
+            </div>
+          </article>
+
+          <article class="dish-card">
+            <div class="dish-image img-pasta">
+              <span class="pill">Popular</span>
+            </div>
+            <div class="dish-info">
+              <div class="dish-title"><h3>Truffle Cream Pasta</h3><strong>Rs. 1,490</strong></div>
+              <p>Fettuccine, mushroom cream, parmesan, truffle oil, crispy garlic.</p>
+            </div>
+          </article>
+
+          <article class="dish-card">
+            <div class="dish-image img-chicken">
+              <span class="pill">Spicy</span>
+            </div>
+            <div class="dish-info">
+              <div class="dish-title"><h3>Hot Honey Chicken</h3><strong>Rs. 1,390</strong></div>
+              <p>Crispy chicken, hot honey glaze, slaw, pickles, seasoned fries.</p>
+            </div>
+          </article>
+
+          <article class="dish-card">
+            <div class="dish-image img-pizza">
+              <span class="pill">Sharing</span>
+            </div>
+            <div class="dish-info">
+              <div class="dish-title"><h3>Ember Pepperoni</h3><strong>Rs. 1,790</strong></div>
+              <p>Stone-baked crust, mozzarella, pepperoni, chili honey, oregano.</p>
+            </div>
+          </article>
+
+          <article class="dish-card">
+            <div class="dish-image img-dessert">
+              <span class="pill">Sweet</span>
+            </div>
+            <div class="dish-info">
+              <div class="dish-title"><h3>Molten Chocolate Cake</h3><strong>Rs. 790</strong></div>
+              <p>Warm chocolate center, vanilla ice cream, cocoa crumble.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section feature" id="about">
+      <div class="container feature-grid">
+        <div class="feature-photo"></div>
+        <div class="feature-copy">
+          <p class="eyebrow">WHY SAFFRON & EMBER</p>
+          <h2>Simple ingredients.<br>Serious flavor.</h2>
+          <p>
+            We prep fresh every day, source quality ingredients, and cook every order with care.
+            Whether you're joining us for dinner or ordering from home, we want every plate to feel special.
+          </p>
+          <div class="feature-points">
+            <div><span>01</span><p><strong>Fresh daily</strong><br>Prepared in-house from quality ingredients.</p></div>
+            <div><span>02</span><p><strong>Fast ordering</strong><br>Chat with our AI assistant to check items and place orders.</p></div>
+            <div><span>03</span><p><strong>Made for sharing</strong><br>Comfort food designed for good company.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section reviews" id="reviews">
+      <div class="container">
+        <p class="eyebrow dark">WHAT GUESTS SAY</p>
+        <h2>Good food. Good mood.</h2>
+        <div class="review-grid">
+          <blockquote>
+            “The burger was unreal — juicy, smoky and actually arrived hot.”
+            <footer>— Hamza R.</footer>
+          </blockquote>
+          <blockquote>
+            “Loved the pasta and the AI chat made ordering surprisingly easy.”
+            <footer>— Areeba K.</footer>
+          </blockquote>
+          <blockquote>
+            “Perfect dinner spot. Great portions, nice ambience, solid service.”
+            <footer>— Ali M.</footer>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact" id="contact">
+      <div class="container contact-grid">
+        <div>
+          <p class="eyebrow">VISIT US</p>
+          <h2>Come hungry.</h2>
+          <p class="muted">123 Food Street, Your City</p>
+          <p class="muted">+92 300 1234567</p>
+          <p class="muted">hello@saffronember.com</p>
+        </div>
+        <div class="hours">
+          <h3>Opening hours</h3>
+          <p><span>Mon — Thu</span><strong>12:00 PM — 11:00 PM</strong></p>
+          <p><span>Fri — Sun</span><strong>12:00 PM — 12:30 AM</strong></p>
+          <button class="btn open-chat">Order now with AI</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <div class="brand">
+        <span class="brand-mark">S</span>
+        <span>Saffron & Ember</span>
+      </div>
+      <p>© <span id="year"></span> Saffron & Ember. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Floating chat button -->
+  <button class="chat-fab" id="chatFab" aria-label="Open AI chat">
+    <span>✦</span>
+    <div><strong>AI Assistant</strong><small>Ask, order, check availability</small></div>
+  </button>
+
+  <!-- Chat panel -->
+  <aside class="chat-panel" id="chatPanel" aria-hidden="true">
+    <div class="chat-head">
+      <div class="agent">
+        <div class="avatar">✦</div>
+        <div>
+          <strong>Restaurant Assistant</strong>
+          <span><i></i> Online</span>
+        </div>
+      </div>
+      <button id="closeChat" aria-label="Close chat">×</button>
+    </div>
+
+    <div class="chat-body" id="chatBody">
+      <div class="message bot">
+        <div class="bubble">
+          Assalam-o-Alaikum 👋 I can help you with the menu, availability, FAQs, and orders. What would you like today?
+        </div>
+      </div>
+      <div class="quick-actions">
+        <button data-message="Show me today's available menu items">View available menu</button>
+        <button data-message="What are your best sellers?">Best sellers</button>
+        <button data-message="I want to place an order">Place an order</button>
+      </div>
+    </div>
+
+    <form class="chat-input" id="chatForm">
+      <input id="chatInput" type="text" placeholder="Type your message..." autocomplete="off" />
+      <button type="submit" aria-label="Send message">➜</button>
+    </form>
+  </aside>
+
+  <script>
+
+const N8N_WEBHOOK = "https://saaibii.app.n8n.cloud/webhook/okk";
+
+const chatPanel = document.getElementById("chatPanel");
+const chatFab = document.getElementById("chatFab");
+const closeChat = document.getElementById("closeChat");
+const chatForm = document.getElementById("chatForm");
+const chatInput = document.getElementById("chatInput");
+const chatBody = document.getElementById("chatBody");
+const menuToggle = document.getElementById("menuToggle");
+const navLinks = document.getElementById("navLinks");
+
+const sessionId =
+  localStorage.getItem("restaurant_chat_session") ||
+  (crypto.randomUUID ? crypto.randomUUID() : `session-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+
+localStorage.setItem("restaurant_chat_session", sessionId);
+document.getElementById("year").textContent = new Date().getFullYear();
+
+function openChat() {
+  chatPanel.classList.add("open");
+  chatPanel.setAttribute("aria-hidden", "false");
+  setTimeout(() => chatInput.focus(), 150);
+}
+
+function closeChatPanel() {
+  chatPanel.classList.remove("open");
+  chatPanel.setAttribute("aria-hidden", "true");
+}
+
+chatFab.addEventListener("click", openChat);
+closeChat.addEventListener("click", closeChatPanel);
+document.querySelectorAll(".open-chat").forEach(btn => btn.addEventListener("click", openChat));
+
+menuToggle.addEventListener("click", () => {
+  const open = navLinks.classList.toggle("open");
+  menuToggle.setAttribute("aria-expanded", String(open));
+});
+
+document.querySelectorAll(".nav-links a").forEach(link => {
+  link.addEventListener("click", () => navLinks.classList.remove("open"));
+});
+
+document.querySelectorAll(".quick-actions button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    openChat();
+    sendMessage(btn.dataset.message);
+  });
+});
+
+function addMessage(text, who = "bot", extraClass = "") {
+  const wrap = document.createElement("div");
+  wrap.className = `message ${who} ${extraClass}`.trim();
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+  chatBody.appendChild(wrap);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  return wrap;
+}
+
+function getReplyFromN8n(data) {
+  if (typeof data === "string") return data;
+
+  // Common n8n response formats
+  return (
+    data?.reply ||
+    data?.output ||
+    data?.message ||
+    data?.text ||
+    data?.response ||
+    data?.answer ||
+    data?.data?.reply ||
+    data?.data?.output ||
+    data?.data?.message ||
+    "I received your message, but the workflow returned an unexpected response format."
+  );
+}
+
+async function sendMessage(message) {
+  const clean = String(message || "").trim();
+  if (!clean) return;
+
+  addMessage(clean, "user");
+  chatInput.value = "";
+
+  const typing = addMessage("Thinking…", "bot", "typing");
+
+  try {
+    const response = await fetch(N8N_WEBHOOK, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: clean,
+        chatInput: clean,
+        sessionId,
+        source: "restaurant-website"
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Webhook returned HTTP ${response.status}`);
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    const data = contentType.includes("application/json")
+      ? await response.json()
+      : await response.text();
+
+    typing.remove();
+    addMessage(getReplyFromN8n(data), "bot");
+  } catch (error) {
+    console.error(error);
+    typing.remove();
+    addMessage(
+      "Sorry, I couldn't reach the ordering assistant right now. Please try again in a moment.",
+      "bot"
+    );
+  }
+}
+
+chatForm.addEventListener("submit", e => {
+  e.preventDefault();
+  sendMessage(chatInput.value);
+});
+
+  </script>
+</body>
+</html>
